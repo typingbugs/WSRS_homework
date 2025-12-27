@@ -30,6 +30,7 @@ from ...modeling_outputs import BaseModelOutput, BaseModelOutputWithPast, Causal
 from ...modeling_utils import PreTrainedModel
 from ...utils import logging
 from .configuration_sasrec import SasrecConfig
+from ...integrations import use_kernel_forward_from_hub
 
 logger = logging.get_logger(__name__)
 
@@ -39,6 +40,27 @@ def _make_causal_mask(q_len: int, k_len: int, device: torch.device, dtype: torch
     mask = torch.full((q_len, k_len), float("-inf"), device=device, dtype=dtype)
     mask = torch.triu(mask, diagonal=1)
     return mask
+
+
+@use_kernel_forward_from_hub("RMSNorm")
+class SasrecRMSNorm(nn.Module):
+    def __init__(self, hidden_size, eps: float = 1e-6) -> None:
+        """
+        SasrecRMSNorm is equivalent to Qwen3RMSNorm
+        """
+        super().__init__()
+        self.weight = nn.Parameter(torch.ones(hidden_size))
+        self.variance_epsilon = eps
+
+    def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
+        input_dtype = hidden_states.dtype
+        hidden_states = hidden_states.to(torch.float32)
+        variance = hidden_states.pow(2).mean(-1, keepdim=True)
+        hidden_states = hidden_states * torch.rsqrt(variance + self.variance_epsilon)
+        return self.weight * hidden_states.to(input_dtype)
+
+    def extra_repr(self):
+        return f"{tuple(self.weight.shape)}, eps={self.variance_epsilon}"
 
 
 class SasrecAttention(nn.Module):
@@ -52,7 +74,7 @@ class SasrecAttention(nn.Module):
         self.k_proj = nn.Linear(config.hidden_size, config.hidden_size)
         self.v_proj = nn.Linear(config.hidden_size, config.hidden_size)
         self.o_proj = nn.Linear(config.hidden_size, config.hidden_size)
-        self.norm = nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps)
+        self.norm = SasrecRMSNorm(config.hidden_size, eps=config.layer_norm_eps)
 
     def _shape(self, x: torch.Tensor, seq_len: int, bsz: int) -> torch.Tensor:
         return x.view(bsz, seq_len, self.num_heads, self.head_dim).transpose(1, 2).contiguous()
