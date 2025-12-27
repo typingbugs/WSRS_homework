@@ -1,0 +1,29 @@
+# model configuration
+model_name_or_path: "model_configs/model_1"
+processor_name_or_path: "model_configs/model_1"
+
+# dataset configuration
+data_dir: "data/run_data"
+
+# training configuration
+seed: 42
+# train
+do_train: true
+output_dir: "data/outputs/setting_1"
+bf16: true
+num_train_epochs: 30
+per_device_train_batch_size: 128
+gradient_accumulation_steps: 2
+optim: adamw_torch
+weight_decay: 1.0e-6
+learning_rate: 4.0e-4
+lr_scheduler_type: cosine
+logging_steps: 1
+save_strategy: "steps"
+save_steps: 200
+report_to: "tensorboard"
+# validation
+do_eval: true
+per_device_eval_batch_size: 128
+eval_strategy: "epoch"
+eval_accumulation_steps: 16

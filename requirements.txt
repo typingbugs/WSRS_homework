@@ -1,0 +1,10 @@
+datasets<4.0.0
+jupyter
+numpy
+tqdm
+pandas
+sentence_transformers
+tensorboard
+wikipedia-api
+openai
+ray
