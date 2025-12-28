@@ -6,6 +6,7 @@ from pathlib import Path
 from tqdm import tqdm
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 
 def load_csv(csv_path: str) -> List[Dict[str, Any]]:
@@ -63,6 +64,20 @@ def build_item_mappings(test_dataset_raw: List[Dict[str, Any]]) -> None:
     save_json(item2id, 'data_preprocess/outputs/item2id.json')
 
 
+def plot_length_freq(lengths: List[int], save_path: str) -> None:
+    plt.figure(figsize=(10, 6))
+    plt.hist(lengths, bins=50, edgecolor='black', alpha=0.7)
+    plt.yscale('log')
+    plt.xlabel('Length of "history_item_id"')
+    plt.ylabel('Frequency (log10 scale)')
+    plt.title('Distribution of "history_item_id" Lengths')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150)
+    plt.close()
+    print(f"Saved histogram to {save_path}")
+
+
 def split_dataset(test_dataset_raw: List[Dict[str, Any]], split_ratio: float = 0.2):
     all_data = []
 
@@ -72,8 +87,15 @@ def split_dataset(test_dataset_raw: List[Dict[str, Any]], split_ratio: float = 0
             'history_item_id': example['history_item_id']
         })
 
-    avg_length = np.mean([len(example['history_item_id']) for example in all_data])
+    # Calculate lengths of history_item_id
+    lengths = [len(example['history_item_id']) for example in all_data]
+    avg_length = np.mean(lengths)
     print(f"Average title sequence length in test data: {avg_length}")
+
+    plot_length_freq(
+        lengths, 
+        save_path='data_preprocess/outputs/len_freq.png'
+    )
 
     valid_indices = random.sample(range(len(all_data)), k=int(split_ratio * len(all_data)))
     valid_set = [all_data[i] for i in valid_indices]
