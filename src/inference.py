@@ -31,7 +31,12 @@ class ItemPredictor:
         attention_mask = encoded["attention_mask"].to(self.model.device)
 
         with torch.no_grad():
-            outputs = self.model(input_ids=input_ids, attention_mask=attention_mask)
+            # Some model configs return a tuple when return_dict=False; normalize to tensor
+            outputs = self.model(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                return_dict=True,
+            )
             logits = outputs.logits  # [batch_size, seq_len, vocab_size]
         
         # Get logits for the last valid position (before padding)
@@ -45,7 +50,8 @@ class ItemPredictor:
         
         # Get top-k predictions
         top_k_logits, top_k_ids = torch.topk(last_logits, k=min(top_k, last_logits.shape[-1]), dim=-1)
-        top_k_probs = torch.softmax(top_k_logits, dim=-1)  # [batch_size, top_k]
+        top_k_logits = top_k_logits.float()  # avoid bf16 -> numpy issues
+        top_k_probs = torch.softmax(top_k_logits, dim=-1).float()  # [batch_size, top_k]
         
         top_k_ids = top_k_ids.cpu().numpy().tolist()
         top_k_probs = top_k_probs.cpu().numpy().tolist()
@@ -63,7 +69,7 @@ def predict_from_file(predictor: ItemPredictor, test_file: str, output_path: str
     results = []
     for batch in tqdm(batches, desc="Predicting next items"):
         batch_user_id = [example['user_id'] for example in batch]
-        batch_histories = [example['title_sequence'] for example in batch]
+        batch_histories = [example["history_item_id"] for example in batch]
 
         top_k_ids, top_k_names, top_k_probs = predictor.predict_next_items_batch(
             batch_histories, top_k=top_k

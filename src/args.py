@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from transformers import HfArgumentParser, TrainingArguments
 import yaml
 import argparse
+from typing import Literal
 
 @dataclass
 class DataArguments:
@@ -23,6 +24,10 @@ class ModelArguments:
     embedding_path: str = field(
         default="data/item_embeddings/all-mpnet-base-v2.npy",
         metadata={"help": "Path to load initial item embeddings."}
+    )
+    stage: Literal[1, 2] = field(
+        default=1,
+        metadata={"help": "Training stage: 1 or 2."}
     )
     
 def get_args():
