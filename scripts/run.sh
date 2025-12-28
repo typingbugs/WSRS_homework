@@ -7,7 +7,7 @@ export PYTHONPATH=/workspace:$PYTHONPATH
 
 mkdir -p logs/
 
-for setting_num in $(seq 1 1); do
+for setting_num in $(seq 2 2); do
 
     mkdir -p logs/settings_${setting_num}
 
