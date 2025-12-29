@@ -1,5 +1,4 @@
 data/
 data_preprocess/outputs/
-data/item_embeddings/
 logs/
 __pycache__/
