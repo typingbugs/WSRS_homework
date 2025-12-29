@@ -10,3 +10,4 @@ openai
 ray
 matplotlib
 trl
+python-dotenv
