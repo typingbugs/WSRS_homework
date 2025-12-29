@@ -41,16 +41,6 @@ def load_json(json_path: str) -> Dict[str, int] | Dict[str, str]:
     return data
 
 
-def get_frequency_distribution(sequences: List[List[int]], num_items: int) -> List[float]:
-    freq = [0.] * (num_items + 1)
-    for seq in sequences:
-        for item_id in seq:
-            freq[item_id] += 1
-    total = sum(freq)
-    freq = [f / total for f in freq]
-    return freq
-
-
 def build_item_mappings(test_dataset_raw: List[Dict[str, Any]]) -> None:
     id2item: Dict[int, str] = {}
 
@@ -115,12 +105,6 @@ def split_dataset(test_dataset_raw: List[Dict[str, Any]], split_ratio: float = 0
     valid_set = [all_data[i] for i in valid_indices]
     train_set = [all_data[i] for i in range(len(all_data)) if i not in valid_indices]
     inference_set = all_data
-
-    freq = get_frequency_distribution(
-        sequences=[example['history_item_id'] for example in all_data],
-        num_items=17408
-    )
-    save_json(freq, 'data_preprocess/outputs/item_frequency.json')
 
     print(f"Train set size: {len(train_set)}, Validation set size: {len(valid_set)}")
 

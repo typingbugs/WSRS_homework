@@ -23,12 +23,6 @@ def load_sequences(path):
     return data
 
 
-def load_freq(json_path: str) -> Dict[str, int] | Dict[str, str]:
-    with open(json_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    return data
-
-
 def save_jsonl(data: List[Dict[str, Any]], save_path: str):
     save_path = Path(save_path)
     save_path.parent.mkdir(parents=True, exist_ok=True)
@@ -38,10 +32,9 @@ def save_jsonl(data: List[Dict[str, Any]], save_path: str):
 
 
 class NegativeSampler:
-    def __init__(self, model_path, item_freq: List[float], num_items=17408, top_k=3):
+    def __init__(self, model_path, num_items=17408, top_k=3):
         self.num_items = num_items
         self.top_k = top_k
-        self.item_freq = item_freq
         
         # Load embeddings and build index
         self.item_embeddings = self._load_item_embeddings(model_path)
@@ -201,17 +194,14 @@ if __name__ == "__main__":
     train_output_path = "data_preprocess/outputs/dpo_train_dataset.jsonl"
     valid_output_path = "data_preprocess/outputs/dpo_valid_dataset.jsonl"
     id2item_path = "data_preprocess/outputs/id2item.json"
-    freq_path = "data_preprocess/outputs/item_frequency.json"
 
     id2item = load_json(id2item_path)
-    freq = load_freq(freq_path)
     
     # Initialize sampler
     sampler = NegativeSampler(
         model_path=model_path,
         num_items=17408,
-        top_k=200,
-        item_freq=freq
+        top_k=200
     )
     
     # Build dataset
