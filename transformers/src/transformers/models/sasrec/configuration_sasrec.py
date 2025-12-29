@@ -63,6 +63,7 @@ class SasrecConfig(PretrainedConfig):
         eos_token_id: int = 2,
         hidden_act: str = "gelu",
         use_cache: bool = False,
+        use_return_dict: bool = True,
         **kwargs,
     ):
         super().__init__(
@@ -70,6 +71,7 @@ class SasrecConfig(PretrainedConfig):
             bos_token_id=bos_token_id,
             eos_token_id=eos_token_id,
             use_cache=use_cache,
+            return_dict=use_return_dict,
             **kwargs,
         )
 

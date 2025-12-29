@@ -1,6 +1,5 @@
 # model configuration
 model_name_or_path: "model_configs/model_1"
-processor_name_or_path: "model_configs/model_1"
 embedding_path: "data/item_embeddings/naive_Qwen3-Embedding-0.6B.npy"
 stage: 1
 
@@ -11,7 +10,7 @@ data_dir: "data/run_data"
 seed: 42
 # train
 do_train: true
-output_dir: "data/outputs/setting_2/stage_1"
+output_dir: "data/outputs/sft/setting_2/stage_1"
 bf16: true
 num_train_epochs: 4
 per_device_train_batch_size: 128

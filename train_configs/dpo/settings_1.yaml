@@ -1,7 +1,5 @@
 # model configuration
-model_name_or_path: "data/outputs/setting_1/stage_1/checkpoint-216"
-processor_name_or_path: "model_configs/model_1"
-stage: 2
+model_name_or_path: "data/outputs/sft/setting_1/stage_2/checkpoint-540"
 
 # dataset configuration
 data_dir: "data/run_data"
@@ -10,20 +8,22 @@ data_dir: "data/run_data"
 seed: 42
 # train
 do_train: true
-output_dir: "data/outputs/setting_1/stage_2"
+output_dir: "data/outputs/dpo/setting_1"
 bf16: true
-num_train_epochs: 10
-per_device_train_batch_size: 128
-gradient_accumulation_steps: 2
+num_train_epochs: 2
+per_device_train_batch_size: 16
+gradient_accumulation_steps: 16
+beta: 0.2
 optim: adamw_torch
 weight_decay: 1.0e-4
-learning_rate: 5.0e-4
+learning_rate: 2.0e-6
 lr_scheduler_type: cosine
-warmup_steps: 28
+warmup_ratio: 0.1
 logging_steps: 1
-save_strategy: "steps"
-save_steps: 100
+save_strategy: "epoch"
 report_to: "tensorboard"
+gradient_checkpointing: false
+max_completion_length: 1
 # validation
 do_eval: true
 per_device_eval_batch_size: 128

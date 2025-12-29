@@ -1,8 +1,8 @@
-from transformers import Trainer
-from src.model import init_model
-from src.dataset import init_dataset, RecommendDataCollator
-from src.metric import compute_metrics, preprocess_logits_for_metrics
-from src.args import get_args
+from dpo.trainer import DPORankingTrainer
+from dpo.model import init_model
+from dpo.dataset import init_dataset
+from dpo.metric import compute_metrics, preprocess_logits_for_metrics
+from dpo.args import get_args
 import logging
 
 
@@ -20,23 +20,19 @@ def main():
     training_args, data_args, model_args = get_args()
     
     logger.info(f"Initializing model from {model_args.model_name_or_path}.")
-    model, processor = init_model(model_args)
+    model, tokenizer = init_model(model_args)
 
     logger.info(f"Loading and processing data from {data_args.data_dir}.")
-    train_set, validation_set = init_dataset(data_args, processor)
-
-    data_collator = RecommendDataCollator(
-        pad_token_id=processor.pad_token_id,
-        model_max_length=processor.max_seq_len
-    )
+    train_set, validation_set = init_dataset(data_args, tokenizer)
     
     logger.info("Starting training...")
-    trainer = Trainer(
+    trainer = DPORankingTrainer(
         model=model,
         args=training_args,
+        processing_class=tokenizer,
         train_dataset=train_set,
         eval_dataset=validation_set,
-        data_collator=data_collator,
+        # data_collator=data_collator,
         compute_metrics=compute_metrics,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics,
     )

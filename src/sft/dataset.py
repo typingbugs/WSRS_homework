@@ -6,7 +6,7 @@ from typing import List, Dict
 from pathlib import Path
 
 
-def init_dataset(data_args, processor):
+def init_dataset(data_args, tokenizer):
     data_dir = Path(data_args.data_dir)
     train_dataset_path = data_dir / "train_dataset.jsonl"
     validation_dataset_path = data_dir / "valid_dataset.jsonl"
@@ -22,7 +22,7 @@ def init_dataset(data_args, processor):
     validation_dataset = Dataset.from_dict(validation_raw_data)
 
     def preprocess_remove_last(example):
-        input_ids = [processor.bos_token_id] + example['history_item_id']
+        input_ids = [tokenizer.bos_token_id] + example['history_item_id']
         input_ids = input_ids[:-1]
         model_inputs = {
             'input_ids': input_ids[:-1],
@@ -31,7 +31,7 @@ def init_dataset(data_args, processor):
         return model_inputs
     
     def preprocess(example):
-        input_ids = [processor.bos_token_id] + example['history_item_id']
+        input_ids = [tokenizer.bos_token_id] + example['history_item_id']
         model_inputs = {
             'input_ids': input_ids[:-1],
             'labels': input_ids[1:]

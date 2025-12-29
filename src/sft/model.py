@@ -1,5 +1,4 @@
-from transformers import AutoModelForCausalLM, AutoConfig
-from src.processor import RecommendProcessor
+from transformers import AutoModelForCausalLM, AutoConfig, AutoTokenizer
 import numpy as np
 import torch
 import logging
@@ -14,7 +13,7 @@ def init_model(model_args):
 
 def init_model_stage1(model_args):
     logger = logging.getLogger(__name__)
-    processor = RecommendProcessor.from_pretrained(model_args.processor_name_or_path)
+    tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path)
 
     config = AutoConfig.from_pretrained(model_args.model_name_or_path)
     model = AutoModelForCausalLM.from_config(config)
@@ -47,11 +46,11 @@ def init_model_stage1(model_args):
         return grad
     model_embedding_weights.register_hook(freeze_item_gradients)
 
-    return model, processor
+    return model, tokenizer
 
 
 def init_model_stage2(model_args):
-    processor = RecommendProcessor.from_pretrained(model_args.processor_name_or_path)
+    tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path)
     model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path)
 
-    return model, processor
+    return model, tokenizer

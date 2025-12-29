@@ -8,23 +8,28 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 from pathlib import Path
-from transformers import AutoModelForCausalLM
-from src.processor import RecommendProcessor
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 class ItemPredictor:
-    def __init__(self, model_path, processor_path):
+    def __init__(self, model_path):
         self.model = AutoModelForCausalLM.from_pretrained(model_path, device_map="auto")
         self.model.eval()
-        self.processor = RecommendProcessor.from_pretrained(processor_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
     
     def predict_next_items_batch(self, batch_history_item_ids, top_k=10):
-        encoded = self.processor(
-            batch_history_item_ids,
-            padding=True,
-            return_tensors="pt",
-            add_special_tokens=True
-        )
+        batch_input = []
+        batch_masks = []
+        for input_id in batch_history_item_ids:
+            if len(input_id) > self.tokenizer.model_max_length:
+                input_id = input_id[-self.tokenizer.model_max_length:]
+            padding_length = self.tokenizer.model_max_length - len(input_id)
+            batch_input.append(input_id + [self.tokenizer.pad_token_id] * padding_length)
+            batch_masks.append([1] * len(input_id) + [0] * padding_length)
+        encoded = {
+            "input_ids": torch.tensor(batch_input, dtype=torch.long),
+            "attention_mask": torch.tensor(batch_masks, dtype=torch.long),
+        }
         
         # Move to the same device as model
         input_ids = encoded["input_ids"].to(self.model.device)
@@ -55,9 +60,8 @@ class ItemPredictor:
         
         top_k_ids = top_k_ids.cpu().numpy().tolist()
         top_k_probs = top_k_probs.cpu().numpy().tolist()
-        top_k_names = [self.processor.decode_titles(ids, skip_special_tokens=True) for ids in top_k_ids]
 
-        return top_k_ids, top_k_names, top_k_probs
+        return top_k_ids, top_k_probs
     
 
 def predict_from_file(predictor: ItemPredictor, test_file: str, output_path: str, top_k: int = 10, batch_size: int = 32):
@@ -71,7 +75,7 @@ def predict_from_file(predictor: ItemPredictor, test_file: str, output_path: str
         batch_user_id = [example['user_id'] for example in batch]
         batch_histories = [example["history_item_id"] for example in batch]
 
-        top_k_ids, top_k_names, top_k_probs = predictor.predict_next_items_batch(
+        top_k_ids, top_k_probs = predictor.predict_next_items_batch(
             batch_histories, top_k=top_k
         )
 
@@ -90,7 +94,6 @@ def predict_from_file(predictor: ItemPredictor, test_file: str, output_path: str
 def get_args():
     parser = argparse.ArgumentParser(description="Next item prediction inference")
     parser.add_argument("--model_path", type=str, required=True, help="Path to the model checkpoint directory")
-    parser.add_argument("--processor_path", type=str, default="data/model_configs", help="Path to the processor config directory")
     parser.add_argument("--test_file", type=str, default="data/cleaned_data/test_dataset.jsonl", help="Path to test dataset JSONL file")
     parser.add_argument("--top_k", type=int, default=10, help="Number of top predictions to return")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for inference")
@@ -101,8 +104,14 @@ def get_args():
 
 def main():
     args = get_args()
-    predictor = ItemPredictor(model_path=args.model_path, processor_path=args.processor_path)
-    predict_from_file(predictor=predictor, test_file=args.test_file, output_path=args.output_file, top_k=args.top_k, batch_size=args.batch_size)
+    predictor = ItemPredictor(model_path=args.model_path)
+    predict_from_file(
+        predictor=predictor, 
+        test_file=args.test_file, 
+        output_path=args.output_file, 
+        top_k=args.top_k, 
+        batch_size=args.batch_size
+    )
 
 
 if __name__ == "__main__":
