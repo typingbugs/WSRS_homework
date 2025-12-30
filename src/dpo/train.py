@@ -1,8 +1,8 @@
-from dpo.trainer import DPORankingTrainer
-from dpo.model import init_model
-from dpo.dataset import init_dataset
-from dpo.metric import compute_metrics, preprocess_logits_for_metrics
-from dpo.args import get_args
+from src.dpo.trainer import DPORankingTrainer
+from src.dpo.model import init_model
+from src.dpo.dataset import init_dataset
+from src.dpo.metric import compute_metrics, preprocess_logits_for_metrics
+from src.dpo.args import get_args
 import logging
 
 

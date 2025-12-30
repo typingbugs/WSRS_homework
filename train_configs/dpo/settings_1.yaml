@@ -2,7 +2,7 @@
 model_name_or_path: "data/outputs/sft/setting_1/stage_2/checkpoint-540"
 
 # dataset configuration
-data_dir: "data/run_data"
+data_dir: "data/train_data"
 
 # training configuration
 seed: 42
@@ -13,7 +13,7 @@ bf16: true
 num_train_epochs: 2
 per_device_train_batch_size: 16
 gradient_accumulation_steps: 16
-beta: 0.2
+beta: 0.1
 optim: adamw_torch
 weight_decay: 1.0e-4
 learning_rate: 2.0e-6

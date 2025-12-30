@@ -4,7 +4,7 @@ embedding_path: "data/item_embeddings/naive_Qwen3-Embedding-8B.npy"
 stage: 1
 
 # dataset configuration
-data_dir: "data/run_data"
+data_dir: "data/train_data"
 
 # training configuration
 seed: 42

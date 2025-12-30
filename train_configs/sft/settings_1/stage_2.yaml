@@ -3,7 +3,7 @@ model_name_or_path: "data/outputs/sft/setting_1/stage_1/checkpoint-216"
 stage: 2
 
 # dataset configuration
-data_dir: "data/run_data"
+data_dir: "data/train_data"
 
 # training configuration
 seed: 42

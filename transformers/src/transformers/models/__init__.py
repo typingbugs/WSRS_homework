@@ -322,6 +322,9 @@ if TYPE_CHECKING:
     from .rt_detr_v2 import *
     from .rwkv import *
     from .sasrec import *
+    from .sasrec_moe import *
+    from .sasrec_rope import *
+    from .sasrec_gate import *
     from .sam import *
     from .sam2 import *
     from .sam2_video import *

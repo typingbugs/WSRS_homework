@@ -1,8 +1,8 @@
 from transformers import Trainer
-from src.model import init_model
-from src.dataset import init_dataset, RecommendDataCollator
-from src.metric import compute_metrics, preprocess_logits_for_metrics
-from src.args import get_args
+from src.sft.model import init_model
+from src.sft.dataset import init_dataset, RecommendDataCollator
+from src.sft.metric import compute_metrics, preprocess_logits_for_metrics
+from src.sft.args import get_args
 import logging
 
 
