@@ -3,7 +3,7 @@ import numpy as np
 import json
 import os
 from collections import defaultdict
-from .embedding_models.encode import encode
+from data_preprocess.build_pretrained_embeddings.embedding_models.encode import encode
 
 
 def load_jsonl(jsonl_path: str):

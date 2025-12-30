@@ -1,5 +1,5 @@
 import faiss
-from ..embedding_models.encode import encode
+from data_preprocess.build_pretrained_embeddings.embedding_models.encode import encode
 from typing import Dict, Any
 import json
 import os
