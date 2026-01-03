@@ -113,6 +113,10 @@ python data_preprocess/build_pretrained_embeddings/item_to_embedding.py
 
 - 使用外部数据（Wikipedia / Steam 等）增强信息的流程（可选）：
 
+流程如图：
+
+![data_aug](https://github.com/typingbugs/WSRS_homework/blob/main/figs/data_augmentation.png)
+
 1. 提取 Steam 数据（若有）：
 
 ```bash
@@ -169,6 +173,10 @@ bash scripts/sft.sh
   若显存受限，请在训练配置中调小 `batch_size` 或 `seq_len`。
   
   如果使用 `flash-attn` 时遇到问题，先用纯 PyTorch 后端验证训练脚本是否能顺利运行，再逐步启用加速库。
+
+  训练分为两阶段，如图：
+
+  ![train](https://github.com/typingbugs/WSRS_homework/blob/main/figs/train_stages.png)
 
 - 运行 DPO 训练：
 
