@@ -1,6 +1,6 @@
 {
     "architectures": [
-        "SasrecForCausalLM"
+        "SasrecRoPEForCausalLM"
     ],
     "attention_dropout": 0.2,
     "hidden_dropout": 0.2,
