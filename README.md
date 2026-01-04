@@ -159,8 +159,8 @@ python data_preprocess/build_pretrained_embeddings/item_to_embedding.py
 - 准备训练配置：在 `train_configs/` 下选择或修改相应的 YAML 配置（例如 `train_configs/sft/settings_1.yaml` 或 `train_configs/dpo/settings_1.yaml`）。
 
 - 推荐做的实验集：
-  - `sasrec`：基准模型（效果最好的一版变体）
-  - 消融与对比变体：`sasrec_rope`、`sasrec_gate`、`sasrec_moe`
+  - `sasrec_rope`：基准模型（效果最好的一版变体）
+  - 消融与对比变体：`sasrec`、`sasrec_gate`、`sasrec_moe`
 
 - 运行 SFT 训练（示例脚本）：
 
@@ -202,13 +202,13 @@ bash scripts/inference.sh
 
 - `transformers/src/transformers/models/sasrec`
   - 说明：参考并实现了效果最好的 SASRec 参考实现。
-  - 主要修改：将 `layer_norm` 替换为 `RMS_norm`（实验证明在本任务中更稳定/更优）。
+  - 主要修改：将 `layer_norm` 替换为 `RMS_norm`，其余部分参考SASRec原论文与实现（可学习位置编码）。
 
 - `transformers/src/transformers/models/sasrec_gate`
   - 说明：在自定义 SASRec 的 MLP 中使用了 Qwen3 的 gate MLP 实现以验证 gate 结构效果。
 
 - `transformers/src/transformers/models/sasrec_rope`
-  - 说明：将原本的可学习位置编码替换为 RoPE（rotary position embeddings），用于研究位置编码对性能的影响。
+  - 说明：将SASRec原本的可学习位置编码替换为 RoPE（rotary position embeddings），用于研究位置编码对性能的影响。（实验证明在本任务中更稳定/更优）。
 
 - `transformers/src/transformers/models/sasrec_moe`
   - 说明：将 SASRec 改造为混合专家（MoE）结构，用于测试模型容量与专家路由对推荐性能的影响。
